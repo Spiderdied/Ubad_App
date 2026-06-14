@@ -4,24 +4,19 @@ using Ubad.Services;
 
 namespace Ubad.ViewModels
 {
-    [QueryProperty(nameof(Repo), "Repo")]
-    public class ProjectDetailViewModel : BaseViewModel
+    // ✅ IQueryAttributable بدلاً من [QueryProperty] مع Objects
+    public class ProjectDetailViewModel : BaseViewModel, IQueryAttributable
     {
         private readonly IFavoritesService _favorites;
         private readonly IGitHubService    _github;
 
-        // ── Repo ──────────────────────────────────────────────────
+        // ── State ─────────────────────────────────────────────────
 
         private GitHubRepository? _repo;
         public GitHubRepository? Repo
         {
             get => _repo;
-            set
-            {
-                SetProperty(ref _repo, value);
-                if (value != null)
-                    _ = InitAsync(value);
-            }
+            private set => SetProperty(ref _repo, value);
         }
 
         private bool _isFavorite;
@@ -33,14 +28,14 @@ namespace Ubad.ViewModels
 
         // ── Commands ──────────────────────────────────────────────
 
-        public ICommand GoBackCommand          { get; }
-        public ICommand ToggleFavoriteCommand  { get; }
-        public ICommand OpenGitHubCommand      { get; }
-        public ICommand OpenWebsiteCommand     { get; }
-        public ICommand OpenBrowserCommand     { get; }
-        public ICommand ShareCommand           { get; }
-        public ICommand CopyUrlCommand         { get; }
-        public ICommand CopyPagesUrlCommand    { get; }
+        public ICommand GoBackCommand         { get; }
+        public ICommand ToggleFavoriteCommand { get; }
+        public ICommand OpenGitHubCommand     { get; }
+        public ICommand OpenWebsiteCommand    { get; }
+        public ICommand OpenBrowserCommand    { get; }
+        public ICommand ShareCommand          { get; }
+        public ICommand CopyUrlCommand        { get; }
+        public ICommand CopyPagesUrlCommand   { get; }
 
         public ProjectDetailViewModel(IFavoritesService favorites, IGitHubService github)
         {
@@ -55,6 +50,16 @@ namespace Ubad.ViewModels
             ShareCommand          = CreateCommand(ShareAsync);
             CopyUrlCommand        = CreateCommand(CopyUrlAsync);
             CopyPagesUrlCommand   = CreateCommand(CopyPagesUrlAsync);
+        }
+
+        // ✅ IQueryAttributable — يعمل مع Objects معقدة
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            if (query.TryGetValue("Repo", out var val) && val is GitHubRepository repo)
+            {
+                Repo = repo;
+                _ = InitAsync(repo);
+            }
         }
 
         private async Task InitAsync(GitHubRepository repo)
