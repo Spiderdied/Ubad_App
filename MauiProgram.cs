@@ -1,6 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 using Ubad.Services;
 using Ubad.ViewModels;
 using Ubad.Views;
@@ -17,23 +15,28 @@ namespace Ubad
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
                 {
-                    fonts.AddFont("Inter-Regular.ttf",    "InterRegular");
-                    fonts.AddFont("Inter-Medium.ttf",     "InterMedium");
-                    fonts.AddFont("Inter-SemiBold.ttf",   "InterSemiBold");
-                    fonts.AddFont("Inter-Bold.ttf",       "InterBold");
-                    fonts.AddFont("MaterialIcons.ttf",    "MaterialIcons");
+                    fonts.AddFont("Inter-Regular.ttf",  "InterRegular");
+                    fonts.AddFont("Inter-Medium.ttf",   "InterMedium");
+                    fonts.AddFont("Inter-SemiBold.ttf", "InterSemiBold");
+                    fonts.AddFont("Inter-Bold.ttf",     "InterBold");
                 });
 
-            // ── HTTP ──────────────────────────────────────────────
-            builder.Services.AddHttpClient<IGitHubService, GitHubService>(client =>
+            // ── HTTP Client ───────────────────────────────────────
+            builder.Services.AddHttpClient<GitHubService>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(30);
             });
 
+            builder.Services.AddSingleton<IGitHubService>(sp =>
+                sp.GetRequiredService<GitHubService>());
+
             // ── Services ──────────────────────────────────────────
-            builder.Services.AddSingleton<ICacheService,    CacheService>();
+            builder.Services.AddSingleton<ICacheService,     CacheService>();
             builder.Services.AddSingleton<IFavoritesService, FavoritesService>();
-            builder.Services.AddSingleton<ISettingsService, SettingsService>();
+            builder.Services.AddSingleton<ISettingsService,  SettingsService>();
+
+            // ── Shell ─────────────────────────────────────────────
+            builder.Services.AddSingleton<AppShell>();
 
             // ── ViewModels ────────────────────────────────────────
             builder.Services.AddTransient<SplashViewModel>();
@@ -46,12 +49,12 @@ namespace Ubad
 
             // ── Views ─────────────────────────────────────────────
             builder.Services.AddTransient<SplashPage>();
-            builder.Services.AddTransient<HomePage>();
-            builder.Services.AddTransient<ProjectsPage>();
+            builder.Services.AddSingleton<HomePage>();
+            builder.Services.AddSingleton<ProjectsPage>();
+            builder.Services.AddSingleton<FavoritesPage>();
+            builder.Services.AddSingleton<SettingsPage>();
             builder.Services.AddTransient<ProjectDetailPage>();
             builder.Services.AddTransient<BrowserPage>();
-            builder.Services.AddTransient<FavoritesPage>();
-            builder.Services.AddTransient<SettingsPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();
