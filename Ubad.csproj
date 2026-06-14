@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <PublishTrimmed>false</PublishTrimmed>
+        <AndroidLinkMode>None</AndroidLinkMode>
         <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
         <TargetFrameworks>net9.0-android</TargetFrameworks>
         <RootNamespace>Ubad</RootNamespace>
