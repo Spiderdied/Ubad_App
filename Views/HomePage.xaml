@@ -15,7 +15,6 @@
         <ScrollView>
             <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
 
-                <!-- ── Hero Header ──────────────────────────────── -->
                 <Grid Grid.Row="0" x:Name="HeroSection">
                     <Grid.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -25,7 +24,6 @@
                         </LinearGradientBrush>
                     </Grid.Background>
 
-                    <!-- Orbs -->
                     <Ellipse WidthRequest="220" HeightRequest="220"
                              HorizontalOptions="End" VerticalOptions="Start"
                              TranslationX="60" TranslationY="-40"
@@ -40,7 +38,6 @@
 
                     <VerticalStackLayout Padding="24,56,24,36" Spacing="0">
 
-                        <!-- Greeting + Settings -->
                         <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,24">
                             <VerticalStackLayout Grid.Column="0" Spacing="2">
                                 <Label Text="{Binding Greeting}"
@@ -53,7 +50,6 @@
                                        TextColor="White"/>
                             </VerticalStackLayout>
 
-                            <!-- Avatar -->
                             <Border Grid.Column="1"
                                     WidthRequest="48" HeightRequest="48"
                                     StrokeThickness="2" Stroke="White"
@@ -63,7 +59,6 @@
                             </Border>
                         </Grid>
 
-                        <!-- Bio -->
                         <Label Text="{Binding Profile.Bio}"
                                FontFamily="InterRegular"
                                FontSize="14"
@@ -72,7 +67,6 @@
                                IsVisible="{Binding Profile.Bio, Converter={StaticResource NullToVisibility}}"
                                Margin="0,0,0,20"/>
 
-                        <!-- Stats Row -->
                         <Grid ColumnDefinitions="*,*,*" Margin="0,4,0,0">
                             <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="2">
                                 <Label Text="{Binding Profile.Followers}"
@@ -122,7 +116,6 @@
                             </VerticalStackLayout>
                         </Grid>
 
-                        <!-- Open Profile Button -->
                         <Button Text="View GitHub Profile →"
                                 Style="{StaticResource GhostButtonStyle}"
                                 TextColor="White"
@@ -136,7 +129,6 @@
                     </VerticalStackLayout>
                 </Grid>
 
-                <!-- ── Loading Skeleton ─────────────────────────── -->
                 <VerticalStackLayout Grid.Row="1"
                                      Padding="20,24,20,0"
                                      Spacing="12"
@@ -145,7 +137,6 @@
                     <comp:SkeletonCard/>
                 </VerticalStackLayout>
 
-                <!-- ── Error State ──────────────────────────────── -->
                 <VerticalStackLayout Grid.Row="1"
                                      Padding="32"
                                      Spacing="16"
@@ -167,7 +158,6 @@
                             HorizontalOptions="Center"/>
                 </VerticalStackLayout>
 
-                <!-- ── Featured Projects Header ─────────────────── -->
                 <Grid Grid.Row="2"
                       Padding="20,28,20,12"
                       ColumnDefinitions="*,Auto"
@@ -186,14 +176,10 @@
                     </Label>
                 </Grid>
 
-                <!-- ── Featured Project Cards ───────────────────── -->
                 <VerticalStackLayout Grid.Row="3"
                                      Padding="20,0,20,0"
                                      Spacing="16"
                                      IsVisible="{Binding IsLoading, Converter={StaticResource InverseBool}}">
-                    <BindableLayout.ItemsSource>
-                        <x:Array Type="{x:Type models:GitHubRepository}"/>
-                    </BindableLayout.ItemsSource>
 
                     <BindableLayout.ItemsSource>
                         <Binding Path="FeaturedRepos"/>
@@ -212,7 +198,6 @@
                     </BindableLayout.ItemTemplate>
                 </VerticalStackLayout>
 
-                <!-- ── Bottom Padding ───────────────────────────── -->
                 <BoxView Grid.Row="4" HeightRequest="32"/>
 
             </Grid>
