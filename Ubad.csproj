@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
         <TargetFrameworks>net9.0-android</TargetFrameworks>
         <RootNamespace>Ubad</RootNamespace>
         <ApplicationId>com.spiderdied.ubad</ApplicationId>
