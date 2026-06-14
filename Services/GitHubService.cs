@@ -8,7 +8,7 @@ namespace Ubad.Services
 {
     public class GitHubService : IGitHubService
     {
-        private readonly HttpClient  _http;
+        private readonly HttpClient    _http;
         private readonly ICacheService _cache;
 
         private static readonly JsonSerializerOptions _jsonOpts = new()
@@ -23,7 +23,7 @@ namespace Ubad.Services
             ConfigureHttpClient();
         }
 
-        // ── Private helpers ───────────────────────────────────────
+        // ── Setup ─────────────────────────────────────────────────
 
         private void ConfigureHttpClient()
         {
@@ -82,34 +82,69 @@ namespace Ubad.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[GitHubService] GetProfile error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine(
+                    $"[GitHubService] GetProfile error: {ex.Message}");
                 return null;
             }
         }
 
-        // ── Pinned Repositories (GraphQL) ─────────────────────────
+        // ── Pinned Repositories ───────────────────────────────────
+        // ✅ GraphQL أولاً (يحتاج token) — Fallback لـ REST تلقائياً
 
-        public async Task<List<GitHubRepository>> GetPinnedRepositoriesAsync(CancellationToken ct = default)
+        public async Task<List<GitHubRepository>> GetPinnedRepositoriesAsync(
+            CancellationToken ct = default)
         {
             const string cacheKey = "pinned_repos";
 
             var cached = await _cache.GetAsync<List<GitHubRepository>>(cacheKey);
             if (cached != null) return cached;
 
+            List<GitHubRepository> repos;
+
+            // GraphQL — يعمل فقط مع token
+            if (!string.IsNullOrWhiteSpace(AppConfig.GitHubToken))
+            {
+                repos = await TryGetPinnedViaGraphQlAsync(ct);
+                if (repos.Count > 0)
+                {
+                    await _cache.SetAsync(cacheKey, repos, AppConfig.CacheExpiryMinutes);
+                    return repos;
+                }
+            }
+
+            // ✅ Fallback: REST API — أفضل 6 repos
+            repos = await GetTopReposViaRestAsync(ct);
+
+            if (repos.Count > 0)
+                await _cache.SetAsync(cacheKey, repos, AppConfig.CacheExpiryMinutes);
+
+            return repos;
+        }
+
+        // ── GraphQL Query ─────────────────────────────────────────
+
+        private async Task<List<GitHubRepository>> TryGetPinnedViaGraphQlAsync(
+            CancellationToken ct)
+        {
             var query = $$"""
             {
-              "query": "query { user(login: \"{{AppConfig.GitHubUsername}}\") { pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { id name description url homepageUrl stargazerCount forkCount watchers { totalCount } openIssues: issues(states: OPEN) { totalCount } primaryLanguage { name color } isPrivate isFork hasIssuesEnabled createdAt updatedAt pushedAt repositoryTopics(first: 10) { nodes { topic { name } } } } } } } }"
+              "query": "query { user(login: \"{{AppConfig.GitHubUsername}}\") { pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { id name description url homepageUrl stargazerCount forkCount watchers { totalCount } openIssues: issues(states: OPEN) { totalCount } primaryLanguage { name color } isPrivate isFork createdAt updatedAt pushedAt repositoryTopics(first: 10) { nodes { topic { name } } } } } } } }"
             }
             """;
 
             try
             {
                 var content  = new StringContent(query, Encoding.UTF8, "application/json");
-                var response = await _http.PostAsync(AppConfig.GitHubGraphQlEndpoint, content, ct);
-                response.EnsureSuccessStatusCode();
+                var response = await _http.PostAsync(
+                    AppConfig.GitHubGraphQlEndpoint, content, ct);
+
+                if (!response.IsSuccessStatusCode) return new();
 
                 var json = await response.Content.ReadAsStringAsync(ct);
                 var doc  = JsonDocument.Parse(json);
+
+                // التحقق من غياب errors
+                if (doc.RootElement.TryGetProperty("errors", out _)) return new();
 
                 var pinnedNodes = doc.RootElement
                     .GetProperty("data")
@@ -121,7 +156,7 @@ namespace Ubad.Services
 
                 foreach (var node in pinnedNodes.EnumerateArray())
                 {
-                    var repo = ParseRepository(node);
+                    var repo = ParseRepositoryFromGraphQl(node);
                     repo.HasPages = await CheckGitHubPagesAsync(
                         AppConfig.GitHubUsername, repo.Name, ct);
 
@@ -132,14 +167,53 @@ namespace Ubad.Services
                     repos.Add(repo);
                 }
 
-                await _cache.SetAsync(cacheKey, repos, AppConfig.CacheExpiryMinutes);
                 return repos;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(
-                    $"[GitHubService] GetPinned error: {ex.Message}");
-                return new List<GitHubRepository>();
+                    $"[GitHubService] GraphQL error: {ex.Message}");
+                return new();
+            }
+        }
+
+        // ── REST Fallback ─────────────────────────────────────────
+
+        private async Task<List<GitHubRepository>> GetTopReposViaRestAsync(
+            CancellationToken ct)
+        {
+            try
+            {
+                var url = $"{AppConfig.GitHubRestEndpoint}/users/{AppConfig.GitHubUsername}" +
+                          "/repos?sort=pushed&per_page=6&type=public";
+
+                var response = await _http.GetAsync(url, ct);
+                response.EnsureSuccessStatusCode();
+
+                var json  = await response.Content.ReadAsStringAsync(ct);
+                var array = JsonDocument.Parse(json).RootElement;
+                var repos = new List<GitHubRepository>();
+
+                foreach (var node in array.EnumerateArray())
+                {
+                    var repo = ParseRepositoryRest(node);
+                    repo.HasPages = await CheckGitHubPagesAsync(
+                        AppConfig.GitHubUsername, repo.Name, ct);
+
+                    if (repo.HasPages)
+                        repo.GitHubPagesUrl =
+                            $"{AppConfig.GitHubPagesBase}/{repo.Name}/";
+
+                    repos.Add(repo);
+                }
+
+                return repos;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"[GitHubService] REST fallback error: {ex.Message}");
+                return new();
             }
         }
 
@@ -154,7 +228,8 @@ namespace Ubad.Services
 
             try
             {
-                var url      = $"{AppConfig.GitHubRestEndpoint}/repos/{AppConfig.GitHubUsername}/{repoName}";
+                var url = $"{AppConfig.GitHubRestEndpoint}/repos/" +
+                          $"{AppConfig.GitHubUsername}/{repoName}";
                 var response = await _http.GetAsync(url, ct);
                 response.EnsureSuccessStatusCode();
 
@@ -193,7 +268,7 @@ namespace Ubad.Services
 
         // ── Parsers ───────────────────────────────────────────────
 
-        private static GitHubRepository ParseRepository(JsonElement node)
+        private static GitHubRepository ParseRepositoryFromGraphQl(JsonElement node)
         {
             var repo = new GitHubRepository
             {
@@ -270,6 +345,10 @@ namespace Ubad.Services
                 lang.ValueKind != JsonValueKind.Null)
                 repo.PrimaryLanguage = lang.GetString() ?? string.Empty;
 
+            repo.FullName = string.IsNullOrEmpty(repo.FullName)
+                ? $"{AppConfig.GitHubUsername}/{repo.Name}"
+                : repo.FullName;
+
             if (node.TryGetProperty("created_at", out var ca) &&
                 DateTime.TryParse(ca.GetString(), out var caDt))
                 repo.CreatedAt = caDt;
@@ -286,20 +365,22 @@ namespace Ubad.Services
         }
     }
 
-    // ── JSON element extensions ───────────────────────────────────
+    // ── JSON Extensions ───────────────────────────────────────────
 
     internal static class JsonElementExtensions
     {
         public static string TryGet(this JsonElement el, string prop)
         {
-            if (el.TryGetProperty(prop, out var v) && v.ValueKind != JsonValueKind.Null)
+            if (el.TryGetProperty(prop, out var v) &&
+                v.ValueKind != JsonValueKind.Null)
                 return v.GetString() ?? string.Empty;
             return string.Empty;
         }
 
         public static int TryGetInt(this JsonElement el, string prop)
         {
-            if (el.TryGetProperty(prop, out var v) && v.ValueKind == JsonValueKind.Number)
+            if (el.TryGetProperty(prop, out var v) &&
+                v.ValueKind == JsonValueKind.Number)
                 return v.GetInt32();
             return 0;
         }
@@ -307,7 +388,8 @@ namespace Ubad.Services
         public static bool TryGetBool(this JsonElement el, string prop)
         {
             if (el.TryGetProperty(prop, out var v) &&
-                (v.ValueKind == JsonValueKind.True || v.ValueKind == JsonValueKind.False))
+                (v.ValueKind == JsonValueKind.True ||
+                 v.ValueKind == JsonValueKind.False))
                 return v.GetBoolean();
             return false;
         }
@@ -316,6 +398,14 @@ namespace Ubad.Services
         {
             if (el.ValueKind == JsonValueKind.Number) return el.GetInt32();
             return 0;
+        }
+
+        public static int TryGetInt(this JsonElement el, string prop, int fallback)
+        {
+            if (el.TryGetProperty(prop, out var v) &&
+                v.ValueKind == JsonValueKind.Number)
+                return v.GetInt32();
+            return fallback;
         }
     }
 }
