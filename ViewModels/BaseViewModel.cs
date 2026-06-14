@@ -19,6 +19,11 @@ namespace Ubad.ViewModels
             if (EqualityComparer<T>.Default.Equals(field, value)) return false;
             field = value;
             OnPropertyChanged(name);
+
+            // ✅ أبلغ ShowContent تلقائياً عند تغيير أي خاصية مرتبطة
+            if (name is nameof(IsLoading) or nameof(HasError) or nameof(IsEmpty))
+                OnPropertyChanged(nameof(ShowContent));
+
             return true;
         }
 
@@ -59,6 +64,7 @@ namespace Ubad.ViewModels
             set => SetProperty(ref _isEmpty, value);
         }
 
+        // ✅ ShowContent يُحسب تلقائياً — لا داعي لـ UpdateShowContent يدوياً
         public bool ShowContent => !IsLoading && !HasError && !IsEmpty;
 
         // ── Navigation ────────────────────────────────────────────
@@ -71,11 +77,15 @@ namespace Ubad.ViewModels
 
         // ── Commands ──────────────────────────────────────────────
 
-        protected ICommand CreateCommand(Func<Task> execute, Func<bool>? canExecute = null) =>
+        protected ICommand CreateCommand(Func<Task> execute,
+            Func<bool>? canExecute = null) =>
             new AsyncCommand(execute, canExecute);
 
-        protected ICommand CreateCommand<T>(Func<T, Task> execute, Func<T, bool>? canExecute = null) =>
+        protected ICommand CreateCommand<T>(Func<T, Task> execute,
+            Func<T, bool>? canExecute = null) =>
             new AsyncCommand<T>(execute, canExecute);
+
+        // ── State Helpers ─────────────────────────────────────────
 
         protected void SetError(string message)
         {
@@ -91,8 +101,7 @@ namespace Ubad.ViewModels
             IsEmpty      = false;
         }
 
-        protected void UpdateShowContent() =>
-            OnPropertyChanged(nameof(ShowContent));
+        // ✅ أُزيل UpdateShowContent() — لم تعد ضرورية
     }
 
     // ── Async Command ─────────────────────────────────────────────
