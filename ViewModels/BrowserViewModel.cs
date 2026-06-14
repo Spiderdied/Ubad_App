@@ -2,8 +2,8 @@ using System.Windows.Input;
 
 namespace Ubad.ViewModels
 {
-    [QueryProperty(nameof(Url), "Url")]
-    public class BrowserViewModel : BaseViewModel
+    // ✅ IQueryAttributable بدلاً من [QueryProperty]
+    public class BrowserViewModel : BaseViewModel, IQueryAttributable
     {
         private string _url = string.Empty;
         public string Url
@@ -40,15 +40,26 @@ namespace Ubad.ViewModels
             set => SetProperty(ref _canGoForward, value);
         }
 
-        public ICommand GoBackCommand        { get; }
-        public ICommand GoForwardCommand     { get; }
-        public ICommand RefreshCommand       { get; }
-        public ICommand ShareCommand         { get; }
-        public ICommand OpenExternalCommand  { get; }
-        public ICommand CloseCommand         { get; }
+        // ✅ IQueryAttributable
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            if (query.TryGetValue("Url", out var val) && val is string url
+                && !string.IsNullOrWhiteSpace(url))
+            {
+                Url       = url;
+                PageTitle = url;
+            }
+        }
 
-        // WebView reference injected from code-behind
+        // WebView reference — يُحقن من code-behind
         public WebView? WebViewRef { get; set; }
+
+        public ICommand GoBackCommand       { get; }
+        public ICommand GoForwardCommand    { get; }
+        public ICommand RefreshCommand      { get; }
+        public ICommand ShareCommand        { get; }
+        public ICommand OpenExternalCommand { get; }
+        public ICommand CloseCommand        { get; }
 
         public BrowserViewModel()
         {
