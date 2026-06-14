@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net9.0-android</TargetFrameworks>
+        <RootNamespace>Ubad</RootNamespace>
+        <ApplicationId>com.spiderdied.ubad</ApplicationId>
+        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+        <OutputType>Exe</OutputType>
+        <UseMaui>true</UseMaui>
+        <SingleProject>true</SingleProject>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <!-- ── App Info ──────────────────────────────────────────── -->
+    <PropertyGroup>
+        <ApplicationTitle>Ubad</ApplicationTitle>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <!-- ── Images ────────────────────────────────────────────── -->
+    <ItemGroup>
+        <MauiImage Include="Resources\Images\*"
+                   BaseSize="300,185"/>
+        <MauiIcon Include="Resources\AppIcon\appicon.svg"
+                  ForegroundFile="Resources\AppIcon\appiconfg.svg"
+                  Color="#6C63FF"/>
+        <MauiSplashScreen Include="Resources\Splash\splash.svg"
+                          Color="#0D0D1A"
+                          BaseSize="128,128"/>
+    </ItemGroup>
+
+    <!-- ── Fonts ─────────────────────────────────────────────── -->
+    <ItemGroup>
+        <MauiFont Include="Resources\Fonts\*"/>
+    </ItemGroup>
+
+    <!-- ── Raw Assets ────────────────────────────────────────── -->
+    <ItemGroup>
+        <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
+    </ItemGroup>
+
+    <!-- ── NuGet ──────────────────────────────────────────────── -->
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0"/>
+    </ItemGroup>
+
+    <!-- ── Android ───────────────────────────────────────────── -->
+    <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+        <AndroidSigningKeyPass></AndroidSigningKeyPass>
+        <AndroidSigningStorePass></AndroidSigningStorePass>
+    </PropertyGroup>
+
+</Project>
