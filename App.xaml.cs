@@ -5,12 +5,16 @@ namespace Ubad
 {
     public partial class App : Application
     {
-        public App(ISettingsService settings)
+        private readonly ISettingsService _settings;
+        private readonly IServiceProvider _services;
+
+        public App(ISettingsService settings, IServiceProvider services)
         {
             InitializeComponent();
+            _settings = settings;
+            _services = services;
 
-            // Apply theme before any UI renders
-            var s = settings.Load();
+            var s = _settings.Load();
             UserAppTheme = s.ThemeMode switch
             {
                 "Light" => AppTheme.Light,
@@ -18,9 +22,7 @@ namespace Ubad
                 _       => AppTheme.Unspecified
             };
 
-            MainPage = new SplashPage(
-                Handler?.MauiContext?.Services.GetService<ViewModels.SplashViewModel>()!
-            );
+            MainPage = _services.GetRequiredService<SplashPage>();
         }
     }
 }
