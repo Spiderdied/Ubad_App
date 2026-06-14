@@ -1,4 +1,7 @@
-namespace Ubad.Helpers
+using Microsoft.Maui.Graphics;// السطر ده هو اللي هيحل الإيرور
+using System;
+
+namespace Ubad.Helpers // اتعدلت لـ small letter
 {
     public static class ColorHelper
     {
