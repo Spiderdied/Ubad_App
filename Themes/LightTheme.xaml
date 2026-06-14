@@ -2,7 +2,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Light Theme Colors -->
     <Color x:Key="BackgroundLight">#F0F0FA</Color>
     <Color x:Key="SurfaceLight">#F8F8FF</Color>
     <Color x:Key="CardLight">#FFFFFF</Color>
@@ -12,7 +11,6 @@
     <Color x:Key="SkeletonLight">#E8E8F5</Color>
     <Color x:Key="DividerLight">#EBEBF5</Color>
 
-    <!-- Dynamic -->
-    <Color x:Key="PageBackground">Light</Color>
+    <Color x:Key="PageBackground">#F0F0FA</Color>
 
 </ResourceDictionary>
