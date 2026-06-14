@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Border xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+        x:Class="Ubad.Components.SkeletonCard"
+        Style="{StaticResource CardStyle}"
+        Padding="20">
+
+    <VerticalStackLayout Spacing="12">
+
+        <!-- Title skeleton -->
+        <Grid ColumnDefinitions="*,Auto">
+            <BoxView Grid.Column="0"
+                     Style="{StaticResource SkeletonStyle}"
+                     HeightRequest="16"
+                     WidthRequest="160"
+                     HorizontalOptions="Start"/>
+            <BoxView Grid.Column="1"
+                     Style="{StaticResource SkeletonStyle}"
+                     HeightRequest="16"
+                     WidthRequest="40"/>
+        </Grid>
+
+        <!-- Language skeleton -->
+        <BoxView Style="{StaticResource SkeletonStyle}"
+                 HeightRequest="12"
+                 WidthRequest="80"
+                 HorizontalOptions="Start"/>
+
+        <!-- Description skeleton -->
+        <VerticalStackLayout Spacing="6">
+            <BoxView Style="{StaticResource SkeletonStyle}"
+                     HeightRequest="12"
+                     HorizontalOptions="FillAndExpand"/>
+            <BoxView Style="{StaticResource SkeletonStyle}"
+                     HeightRequest="12"
+                     WidthRequest="220"
+                     HorizontalOptions="Start"/>
+        </VerticalStackLayout>
+
+        <!-- Stats skeleton -->
+        <HorizontalStackLayout Spacing="12">
+            <BoxView Style="{StaticResource SkeletonStyle}"
+                     HeightRequest="12"
+                     WidthRequest="50"/>
+            <BoxView Style="{StaticResource SkeletonStyle}"
+                     HeightRequest="12"
+                     WidthRequest="40"/>
+            <BoxView Style="{StaticResource SkeletonStyle}"
+                     HeightRequest="12"
+                     WidthRequest="60"/>
+        </HorizontalStackLayout>
+
+        <!-- Buttons skeleton -->
+        <HorizontalStackLayout Spacing="8">
+            <BoxView Style="{StaticResource SkeletonStyle}"
+                     HeightRequest="36"
+                     WidthRequest="90"
+                     CornerRadius="10"/>
+            <BoxView Style="{StaticResource SkeletonStyle}"
+                     HeightRequest="36"
+                     WidthRequest="110"
+                     CornerRadius="10"/>
+        </HorizontalStackLayout>
+
+    </VerticalStackLayout>
+
+</Border>

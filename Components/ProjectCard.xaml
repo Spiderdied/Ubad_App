@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Border xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+        xmlns:models="clr-namespace:Ubad.Models"
+        x:Class="Ubad.Components.ProjectCard"
+        Style="{StaticResource CardStyle}"
+        x:DataType="models:GitHubRepository">
+
+    <Border.GestureRecognizers>
+        <TapGestureRecognizer Tapped="OnCardTapped"/>
+    </Border.GestureRecognizers>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto" Padding="20" RowSpacing="0">
+
+        <!-- Row 0: Repo name + Favorite -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*,Auto"
+              Margin="0,0,0,8">
+            <VerticalStackLayout Grid.Column="0" Spacing="3">
+                <Label Text="{Binding Name}"
+                       FontFamily="InterBold"
+                       FontSize="17"
+                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                       MaxLines="1"
+                       LineBreakMode="TailTruncation"/>
+                <HorizontalStackLayout Spacing="6"
+                    IsVisible="{Binding PrimaryLanguage, Converter={StaticResource NullToVisibility}}">
+                    <Ellipse WidthRequest="8" HeightRequest="8"
+                             Fill="{Binding LanguageColor, Converter={StaticResource HexToColor}}"
+                             VerticalOptions="Center"/>
+                    <Label Text="{Binding PrimaryLanguage}"
+                           FontFamily="InterMedium"
+                           FontSize="12"
+                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                           VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            <!-- Favorite Icon -->
+            <ImageButton Grid.Column="1"
+                         x:Name="FavoriteButton"
+                         WidthRequest="36" HeightRequest="36"
+                         BackgroundColor="Transparent"
+                         Clicked="OnFavoriteClicked"
+                         VerticalOptions="Start">
+                <ImageButton.Source>
+                    <AppThemeBinding Light="icon_heart.png" Dark="icon_heart.png"/>
+                </ImageButton.Source>
+            </ImageButton>
+        </Grid>
+
+        <!-- Row 1: Description -->
+        <Label Grid.Row="1"
+               Text="{Binding Description}"
+               Style="{StaticResource BodyStyle}"
+               MaxLines="2"
+               LineBreakMode="TailTruncation"
+               Margin="0,0,0,14"
+               IsVisible="{Binding Description, Converter={StaticResource NullToVisibility}}"/>
+
+        <!-- Row 2: Stats -->
+        <HorizontalStackLayout Grid.Row="2" Spacing="16" Margin="0,0,0,16">
+            <HorizontalStackLayout Spacing="4">
+                <Label Text="⭐" FontSize="12" VerticalOptions="Center"/>
+                <Label Text="{Binding Stars, Converter={StaticResource StarCount}}"
+                       FontFamily="InterMedium"
+                       FontSize="12"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                       VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="4">
+                <Label Text="⑂" FontSize="12" VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"/>
+                <Label Text="{Binding Forks}"
+                       FontFamily="InterMedium"
+                       FontSize="12"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                       VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+
+            <Label Text="{Binding UpdatedAtDisplay}"
+                   FontFamily="InterRegular"
+                   FontSize="11"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                   VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+
+        <!-- Row 3: Action Buttons -->
+        <HorizontalStackLayout Grid.Row="3" Spacing="8">
+            <Button Text="GitHub"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    HeightRequest="36"
+                    FontSize="12"
+                    Padding="14,0"
+                    CornerRadius="10"
+                    Clicked="OnGitHubClicked"/>
+
+            <Button Text="🌐 Website"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    HeightRequest="36"
+                    FontSize="12"
+                    Padding="14,0"
+                    CornerRadius="10"
+                    IsVisible="{Binding HasWebsite}"
+                    Clicked="OnWebsiteClicked"/>
+        </HorizontalStackLayout>
+
+    </Grid>
+
+</Border>
