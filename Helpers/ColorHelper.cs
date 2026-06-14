@@ -1,7 +1,7 @@
-using Microsoft.Maui.Graphics;// السطر ده هو اللي هيحل الإيرور
+using Microsoft.Maui.Graphics;
 using System;
 
-namespace Ubad.Helpers // اتعدلت لـ small letter
+namespace Ubad.Helpers 
 {
     public static class ColorHelper
     {
@@ -13,8 +13,9 @@ namespace Ubad.Helpers // اتعدلت لـ small letter
 
         public static Color Darken(Color c, double amount = 0.15)
         {
-            c.ToHsv(out float h, out float s, out float v);
-            return Color.FromHsv(h, s, Math.Max(0f, v - (float)amount));
+            // 🛠️ حل بديل ومضمون 100%: تغميق اللون عن طريق تقليل الـ RGB
+            float factor = (float)Math.Max(0.0, 1.0 - amount);
+            return new Color(c.Red * factor, c.Green * factor, c.Blue * factor, c.Alpha);
         }
 
         public static Color WithAlpha(Color c, double alpha) =>
