@@ -3,6 +3,7 @@
     <PropertyGroup>
         <PublishTrimmed>false</PublishTrimmed>
         <AndroidLinkMode>None</AndroidLinkMode>
+        <RunAOTCompilation>false</RunAOTCompilation>
         <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
         <TargetFrameworks>net9.0-android</TargetFrameworks>
         <RootNamespace>Ubad</RootNamespace>
