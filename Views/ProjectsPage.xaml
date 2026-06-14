@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Ubad.ViewModels"
+             xmlns:comp="clr-namespace:Ubad.Components"
+             xmlns:models="clr-namespace:Ubad.Models"
+             x:Class="Ubad.Views.ProjectsPage"
+             x:DataType="vm:ProjectsViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- ── App Bar ──────────────────────────────────────────── -->
+        <Grid Grid.Row="0" Padding="20,52,20,12"
+              ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0"
+                   Text="Projects"
+                   Style="{StaticResource HeadlineStyle}"/>
+            <Label Grid.Column="1"
+                   Text="{Binding FilteredRepos.Count, StringFormat='{0} repos'}"
+                   Style="{StaticResource CaptionStyle}"
+                   VerticalOptions="End"
+                   Margin="0,0,0,4"/>
+        </Grid>
+
+        <!-- ── Search + Filters ─────────────────────────────────── -->
+        <VerticalStackLayout Grid.Row="1" Spacing="12" Padding="20,0,20,12">
+
+            <!-- Search Bar -->
+            <Border StrokeShape="RoundRectangle 14"
+                    StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                    Padding="0">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+                </Border.Shadow>
+
+                <Grid ColumnDefinitions="Auto,*,Auto" Padding="12,0">
+                    <Label Grid.Column="0" Text="🔍" FontSize="16"
+                           VerticalOptions="Center" Margin="0,0,8,0"/>
+                    <Entry Grid.Column="1"
+                           Text="{Binding SearchQuery}"
+                           Placeholder="Search projects…"
+                           FontFamily="InterRegular"
+                           FontSize="14"
+                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                           PlaceholderColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                           BackgroundColor="Transparent"
+                           HeightRequest="44"/>
+                    <ImageButton Grid.Column="2"
+                                 Source="icon_close.png"
+                                 WidthRequest="20" HeightRequest="20"
+                                 Command="{Binding ClearSearchCommand}"
+                                 IsVisible="{Binding SearchQuery, Converter={StaticResource NullToVisibility}}"
+                                 VerticalOptions="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- Sort Chips -->
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout Spacing="8">
+                    <Border StrokeShape="RoundRectangle 20" StrokeThickness="0"
+                            Padding="14,8">
+                        <Border.BackgroundColor>
+                            <AppThemeBinding Light="#6C63FF" Dark="#6C63FF"/>
+                        </Border.BackgroundColor>
+                        <Label Text="⭐ Stars" FontFamily="InterSemiBold"
+                               FontSize="13" TextColor="White">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProjectsViewModel}}, Path=LoadCommand}"
+                                                      CommandParameter="Stars"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Border>
+
+                    <Border StrokeShape="RoundRectangle 20" StrokeThickness="1"
+                            Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                            Padding="14,8"
+                            BackgroundColor="Transparent">
+                        <Label Text="📅 Updated" FontFamily="InterMedium"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Border>
+
+                    <Border StrokeShape="RoundRectangle 20" StrokeThickness="1"
+                            Stroke="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                            Padding="14,8"
+                            BackgroundColor="Transparent">
+                        <Label Text="🔠 Name" FontFamily="InterMedium"
+                               FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}">
+                        </Label>
+                    </Border>
+                </HorizontalStackLayout>
+            </ScrollView>
+        </VerticalStackLayout>
+
+        <!-- ── Content ──────────────────────────────────────────── -->
+        <Grid Grid.Row="2">
+
+            <!-- Skeleton Loading -->
+            <ScrollView IsVisible="{Binding IsLoading}">
+                <VerticalStackLayout Padding="20,0" Spacing="16">
+                    <comp:SkeletonCard/>
+                    <comp:SkeletonCard/>
+                    <comp:SkeletonCard/>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Error State -->
+            <VerticalStackLayout
+                IsVisible="{Binding HasError}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Padding="32"
+                Spacing="16">
+                <Label Text="😔" FontSize="48" HorizontalOptions="Center"/>
+                <Label Text="Failed to load"
+                       Style="{StaticResource SubtitleStyle}"
+                       HorizontalOptions="Center"/>
+                <Label Text="{Binding ErrorMessage}"
+                       Style="{StaticResource BodyStyle}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+                <Button Text="Retry"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Command="{Binding LoadCommand}"
+                        HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Empty State -->
+            <VerticalStackLayout
+                IsVisible="{Binding IsEmpty}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Padding="32"
+                Spacing="12">
+                <Label Text="🔍" FontSize="48" HorizontalOptions="Center"/>
+                <Label Text="No projects found"
+                       Style="{StaticResource SubtitleStyle}"
+                       HorizontalOptions="Center"/>
+                <Label Text="Try adjusting your search or filters"
+                       Style="{StaticResource BodyStyle}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Projects List -->
+            <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                         Command="{Binding RefreshCommand}"
+                         RefreshColor="{StaticResource Primary}"
+                         IsVisible="{Binding ShowContent}">
+                <CollectionView ItemsSource="{Binding FilteredRepos}"
+                                Margin="0,0,0,20">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="16"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:GitHubRepository">
+                            <comp:ProjectCard
+                                Margin="20,0"
+                                Repo="{Binding .}"
+                                TapCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ProjectsViewModel}},
+                                             Path=NavigateToDetailCommand}"
+                                FavoriteCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:ProjectsViewModel}},
+                                                  Path=ToggleFavoriteCommand}"/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

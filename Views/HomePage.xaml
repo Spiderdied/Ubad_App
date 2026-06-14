@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Ubad.ViewModels"
+             xmlns:comp="clr-namespace:Ubad.Components"
+             xmlns:models="clr-namespace:Ubad.Models"
+             x:Class="Ubad.Views.HomePage"
+             x:DataType="vm:HomeViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}"
+                 Command="{Binding RefreshCommand}"
+                 RefreshColor="{StaticResource Primary}">
+
+        <ScrollView>
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+
+                <!-- ── Hero Header ──────────────────────────────── -->
+                <Grid Grid.Row="0" x:Name="HeroSection">
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#6C63FF" Offset="0"/>
+                            <GradientStop Color="#8B85FF" Offset="0.5"/>
+                            <GradientStop Color="#FF6584" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+
+                    <!-- Orbs -->
+                    <Ellipse WidthRequest="220" HeightRequest="220"
+                             HorizontalOptions="End" VerticalOptions="Start"
+                             TranslationX="60" TranslationY="-40"
+                             Opacity="0.2">
+                        <Ellipse.Fill>
+                            <RadialGradientBrush>
+                                <GradientStop Color="White" Offset="0"/>
+                                <GradientStop Color="Transparent" Offset="1"/>
+                            </RadialGradientBrush>
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                    <VerticalStackLayout Padding="24,56,24,36" Spacing="0">
+
+                        <!-- Greeting + Settings -->
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,24">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding Greeting}"
+                                       FontFamily="InterRegular"
+                                       FontSize="14"
+                                       TextColor="#FFFFFFAA"/>
+                                <Label Text="Spiderdied"
+                                       FontFamily="InterBold"
+                                       FontSize="26"
+                                       TextColor="White"/>
+                            </VerticalStackLayout>
+
+                            <!-- Avatar -->
+                            <Border Grid.Column="1"
+                                    WidthRequest="48" HeightRequest="48"
+                                    StrokeThickness="2" Stroke="White"
+                                    StrokeShape="Ellipse">
+                                <Image Source="{Binding Profile.AvatarUrl}"
+                                       Aspect="AspectFill"/>
+                            </Border>
+                        </Grid>
+
+                        <!-- Bio -->
+                        <Label Text="{Binding Profile.Bio}"
+                               FontFamily="InterRegular"
+                               FontSize="14"
+                               TextColor="#FFFFFFCC"
+                               MaxLines="2"
+                               IsVisible="{Binding Profile.Bio, Converter={StaticResource NullToVisibility}}"
+                               Margin="0,0,0,20"/>
+
+                        <!-- Stats Row -->
+                        <Grid ColumnDefinitions="*,*,*" Margin="0,4,0,0">
+                            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="2">
+                                <Label Text="{Binding Profile.Followers}"
+                                       FontFamily="InterBold"
+                                       FontSize="22"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Followers"
+                                       FontFamily="InterRegular"
+                                       FontSize="12"
+                                       TextColor="#FFFFFFAA"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+
+                            <BoxView Grid.Column="0" WidthRequest="1" HeightRequest="36"
+                                     Color="#44FFFFFF"
+                                     HorizontalOptions="End" VerticalOptions="Center"/>
+
+                            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="2">
+                                <Label Text="{Binding TotalStars}"
+                                       FontFamily="InterBold"
+                                       FontSize="22"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Stars"
+                                       FontFamily="InterRegular"
+                                       FontSize="12"
+                                       TextColor="#FFFFFFAA"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+
+                            <BoxView Grid.Column="1" WidthRequest="1" HeightRequest="36"
+                                     Color="#44FFFFFF"
+                                     HorizontalOptions="End" VerticalOptions="Center"/>
+
+                            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="2">
+                                <Label Text="{Binding Profile.PinnedReposCount}"
+                                       FontFamily="InterBold"
+                                       FontSize="22"
+                                       TextColor="White"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Pinned"
+                                       FontFamily="InterRegular"
+                                       FontSize="12"
+                                       TextColor="#FFFFFFAA"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Open Profile Button -->
+                        <Button Text="View GitHub Profile →"
+                                Style="{StaticResource GhostButtonStyle}"
+                                TextColor="White"
+                                BorderColor="#44FFFFFF"
+                                BorderWidth="1"
+                                BackgroundColor="#22FFFFFF"
+                                CornerRadius="12"
+                                HeightRequest="40"
+                                Margin="0,24,0,0"
+                                Command="{Binding OpenProfileCommand}"/>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <!-- ── Loading Skeleton ─────────────────────────── -->
+                <VerticalStackLayout Grid.Row="1"
+                                     Padding="20,24,20,0"
+                                     Spacing="12"
+                                     IsVisible="{Binding IsLoading}">
+                    <comp:SkeletonCard/>
+                    <comp:SkeletonCard/>
+                </VerticalStackLayout>
+
+                <!-- ── Error State ──────────────────────────────── -->
+                <VerticalStackLayout Grid.Row="1"
+                                     Padding="32"
+                                     Spacing="16"
+                                     IsVisible="{Binding HasError}"
+                                     HorizontalOptions="Center">
+                    <Label Text="⚠️"
+                           FontSize="48"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Something went wrong"
+                           Style="{StaticResource SubtitleStyle}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="{Binding ErrorMessage}"
+                           Style="{StaticResource BodyStyle}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                    <Button Text="Retry"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Command="{Binding LoadCommand}"
+                            HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+                <!-- ── Featured Projects Header ─────────────────── -->
+                <Grid Grid.Row="2"
+                      Padding="20,28,20,12"
+                      ColumnDefinitions="*,Auto"
+                      IsVisible="{Binding IsLoading, Converter={StaticResource InverseBool}}">
+                    <Label Grid.Column="0"
+                           Text="Pinned Projects"
+                           Style="{StaticResource TitleStyle}"/>
+                    <Label Grid.Column="1"
+                           Text="View all →"
+                           Style="{StaticResource CaptionStyle}"
+                           TextColor="{StaticResource Primary}"
+                           VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ViewAllCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+
+                <!-- ── Featured Project Cards ───────────────────── -->
+                <VerticalStackLayout Grid.Row="3"
+                                     Padding="20,0,20,0"
+                                     Spacing="16"
+                                     IsVisible="{Binding IsLoading, Converter={StaticResource InverseBool}}">
+                    <BindableLayout.ItemsSource>
+                        <x:Array Type="{x:Type models:GitHubRepository}"/>
+                    </BindableLayout.ItemsSource>
+
+                    <BindableLayout.ItemsSource>
+                        <Binding Path="FeaturedRepos"/>
+                    </BindableLayout.ItemsSource>
+
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="models:GitHubRepository">
+                            <comp:ProjectCard
+                                Repo="{Binding .}"
+                                TapCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}},
+                                             Path=NavigateToDetailCommand}"
+                                FavoriteCommand="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}},
+                                                  Path=NavigateToDetailCommand}"
+                                Margin="0"/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <!-- ── Bottom Padding ───────────────────────────── -->
+                <BoxView Grid.Row="4" HeightRequest="32"/>
+
+            </Grid>
+        </ScrollView>
+    </RefreshView>
+
+</ContentPage>

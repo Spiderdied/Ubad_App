@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Ubad.ViewModels"
+             xmlns:models="clr-namespace:Ubad.Models"
+             x:Class="Ubad.Views.ProjectDetailPage"
+             x:DataType="vm:ProjectDetailViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- ── Custom Nav Bar ───────────────────────────────────── -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*,Auto"
+              Padding="20,52,20,16"
+              BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
+
+            <ImageButton Grid.Column="0"
+                         Source="icon_back.png"
+                         WidthRequest="40" HeightRequest="40"
+                         CornerRadius="12"
+                         BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                         Padding="10"
+                         Command="{Binding GoBackCommand}"/>
+
+            <Label Grid.Column="1"
+                   Text="{Binding Repo.Name}"
+                   Style="{StaticResource SubtitleStyle}"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+
+            <ImageButton Grid.Column="2"
+                         Source="icon_share.png"
+                         WidthRequest="40" HeightRequest="40"
+                         CornerRadius="12"
+                         BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                         Padding="10"
+                         Command="{Binding ShareCommand}"/>
+        </Grid>
+
+        <!-- ── Scroll Content ───────────────────────────────────── -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- ── Header Card ──────────────────────────────── -->
+                <Border Margin="20,12" Style="{StaticResource CardStyle}" Padding="24">
+                    <VerticalStackLayout Spacing="16">
+
+                        <!-- Name + Favorite -->
+                        <Grid ColumnDefinitions="*,Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="6">
+                                <Label Text="{Binding Repo.Name}"
+                                       FontFamily="InterBold"
+                                       FontSize="22"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"/>
+                                <Label Text="{Binding Repo.FullName}"
+                                       Style="{StaticResource CaptionStyle}"/>
+                            </VerticalStackLayout>
+
+                            <ImageButton Grid.Column="1"
+                                         WidthRequest="44" HeightRequest="44"
+                                         CornerRadius="22"
+                                         BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}"
+                                         Command="{Binding ToggleFavoriteCommand}"
+                                         VerticalOptions="Start">
+                                <ImageButton.Source>
+                                    <AppThemeBinding Light="icon_heart.png" Dark="icon_heart.png"/>
+                                </ImageButton.Source>
+                            </ImageButton>
+                        </Grid>
+
+                        <!-- Description -->
+                        <Label Text="{Binding Repo.Description}"
+                               Style="{StaticResource BodyStyle}"
+                               IsVisible="{Binding Repo.Description, Converter={StaticResource NullToVisibility}}"/>
+
+                        <!-- Stats Row -->
+                        <Grid ColumnDefinitions="*,*,*,*">
+                            <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="4">
+                                <Label Text="{Binding Repo.Stars, Converter={StaticResource StarCount}}"
+                                       FontFamily="InterBold" FontSize="18"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Stars" Style="{StaticResource CaptionStyle}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="4">
+                                <Label Text="{Binding Repo.Forks}"
+                                       FontFamily="InterBold" FontSize="18"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Forks" Style="{StaticResource CaptionStyle}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="4">
+                                <Label Text="{Binding Repo.Watchers}"
+                                       FontFamily="InterBold" FontSize="18"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Watchers" Style="{StaticResource CaptionStyle}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="3" HorizontalOptions="Center" Spacing="4">
+                                <Label Text="{Binding Repo.OpenIssues}"
+                                       FontFamily="InterBold" FontSize="18"
+                                       TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="Issues" Style="{StaticResource CaptionStyle}"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                        <!-- Language Badge -->
+                        <HorizontalStackLayout Spacing="8"
+                            IsVisible="{Binding Repo.PrimaryLanguage, Converter={StaticResource NullToVisibility}}">
+                            <Ellipse WidthRequest="10" HeightRequest="10"
+                                     Fill="{Binding Repo.LanguageColor, Converter={StaticResource HexToColor}}"
+                                     VerticalOptions="Center"/>
+                            <Label Text="{Binding Repo.PrimaryLanguage}"
+                                   FontFamily="InterMedium"
+                                   FontSize="13"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                                   VerticalOptions="Center"/>
+                            <Label Text="·" Style="{StaticResource CaptionStyle}" VerticalOptions="Center"/>
+                            <Label Text="{Binding Repo.UpdatedAtDisplay}"
+                                   Style="{StaticResource CaptionStyle}" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── Actions ───────────────────────────────────── -->
+                <Border Margin="20,0,20,12" Style="{StaticResource CardStyle}" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Actions"
+                               FontFamily="InterSemiBold"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                               Margin="0,0,0,4"/>
+
+                        <Button Text="⬡  View on GitHub"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Command="{Binding OpenGitHubCommand}"/>
+
+                        <!-- Website Actions – only when HasWebsite -->
+                        <Button Text="🌐  Open Website"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding OpenWebsiteCommand}"
+                                IsVisible="{Binding Repo.HasWebsite}"/>
+
+                        <Button Text="🔎  Preview Website"
+                                Style="{StaticResource GhostButtonStyle}"
+                                Command="{Binding OpenBrowserCommand}"
+                                CommandParameter="{Binding Repo.GitHubPagesUrl}"
+                                IsVisible="{Binding Repo.HasWebsite}"/>
+
+                        <BoxView Style="{StaticResource DividerStyle}"/>
+
+                        <!-- Copy Actions -->
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                            <Button Grid.Column="0"
+                                    Text="📋 Copy URL"
+                                    Style="{StaticResource GhostButtonStyle}"
+                                    BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                                    BorderWidth="1"
+                                    Command="{Binding CopyUrlCommand}"/>
+
+                            <Button Grid.Column="1"
+                                    Text="📋 Copy Site URL"
+                                    Style="{StaticResource GhostButtonStyle}"
+                                    BorderColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}"
+                                    BorderWidth="1"
+                                    Command="{Binding CopyPagesUrlCommand}"
+                                    IsVisible="{Binding Repo.HasWebsite}"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── Topics ────────────────────────────────────── -->
+                <Border Margin="20,0,20,12"
+                        Style="{StaticResource CardStyle}"
+                        Padding="20"
+                        IsVisible="{Binding Repo.Topics.Count, Converter={StaticResource IntToVisibility}}">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Topics"
+                               FontFamily="InterSemiBold"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"/>
+
+                        <FlexLayout Wrap="Wrap" JustifyContent="Start">
+                            <BindableLayout.ItemsSource>
+                                <Binding Path="Repo.Topics"/>
+                            </BindableLayout.ItemsSource>
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <Border StrokeShape="RoundRectangle 20"
+                                            StrokeThickness="0"
+                                            Padding="10,5"
+                                            Margin="4"
+                                            BackgroundColor="#206C63FF">
+                                        <Label Text="{Binding .}"
+                                               FontFamily="InterMedium"
+                                               FontSize="12"
+                                               TextColor="{StaticResource Primary}"/>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ── Metadata ──────────────────────────────────── -->
+                <Border Margin="20,0,20,24" Style="{StaticResource CardStyle}" Padding="20">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Details"
+                               FontFamily="InterSemiBold"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"/>
+
+                        <!-- Created -->
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Grid.Column="0" Text="Created"
+                                   FontFamily="InterMedium" FontSize="13"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                                   WidthRequest="90"/>
+                            <Label Grid.Column="1"
+                                   Text="{Binding Repo.CreatedAt, StringFormat='{0:MMMM d, yyyy}'}"
+                                   FontFamily="InterRegular" FontSize="13"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"/>
+                        </Grid>
+
+                        <BoxView Style="{StaticResource DividerStyle}"/>
+
+                        <!-- Updated -->
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Grid.Column="0" Text="Updated"
+                                   FontFamily="InterMedium" FontSize="13"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                                   WidthRequest="90"/>
+                            <Label Grid.Column="1"
+                                   Text="{Binding Repo.UpdatedAtDisplay}"
+                                   FontFamily="InterRegular" FontSize="13"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"/>
+                        </Grid>
+
+                        <BoxView Style="{StaticResource DividerStyle}"/>
+
+                        <!-- Fork -->
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Grid.Column="0" Text="Forked"
+                                   FontFamily="InterMedium" FontSize="13"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                                   WidthRequest="90"/>
+                            <Label Grid.Column="1"
+                                   Text="{Binding Repo.IsFork}"
+                                   FontFamily="InterRegular" FontSize="13"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

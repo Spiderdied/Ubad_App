@@ -1,0 +1,54 @@
+< ?xml version = "1.0" encoding = "utf-8" ? > < ContentPage xmlns = "http://schemas.microsoft.com/dotnet/2021/maui"
+xmlns: x = "http://schemas.microsoft.com/winfx/2009/xaml"
+x: Class = "Ubad.Views.SplashPage"
+Shell.NavBarIsVisible = "False"
+NavigationPage.HasNavigationBar = "False" > < Grid >
+<!-- Animated Background --> < Grid.Background > < LinearGradientBrush StartPoint = "0,0" EndPoint = "1,1" > < GradientStop Color = "#0D0D1A" Offset = "0.0"/ > < GradientStop Color = "#1A1040" Offset = "0.5"/ > < GradientStop Color = "#0D0D1A" Offset = "1.0"/ > < /LinearGradientBrush > < /Grid.Background >
+
+<!-- Orb effects --> < Ellipse WidthRequest = "350" HeightRequest = "350"
+HorizontalOptions = "Center" VerticalOptions = "Center"
+TranslationY = "-120" TranslationX = "-60" > < Ellipse.Fill > < RadialGradientBrush > < GradientStop Color = "#306C63FF" Offset = "0.0"/ > < GradientStop Color = "#006C63FF" Offset = "1.0"/ > < /RadialGradientBrush > < /Ellipse.Fill > < /Ellipse > < Ellipse WidthRequest = "280" HeightRequest = "280"
+HorizontalOptions = "Center" VerticalOptions = "Center"
+TranslationY = "100" TranslationX = "80" > < Ellipse.Fill > < RadialGradientBrush > < GradientStop Color = "#25FF6584" Offset = "0.0"/ > < GradientStop Color = "#00FF6584" Offset = "1.0"/ > < /RadialGradientBrush > < /Ellipse.Fill > < /Ellipse >
+
+<!-- Center Content --> < VerticalStackLayout HorizontalOptions = "Center"
+VerticalOptions = "Center"
+Spacing = "0"
+x: Name = "LogoStack" >
+
+<!-- Logo Container --> < Border x: Name = "LogoBorder"
+WidthRequest = "96"
+HeightRequest = "96"
+HorizontalOptions = "Center"
+StrokeThickness = "0"
+StrokeShape = "RoundRectangle 24"
+Opacity = "0" > < Border.Background > < LinearGradientBrush StartPoint = "0,0" EndPoint = "1,1" > < GradientStop Color = "#6C63FF" Offset = "0"/ > < GradientStop Color = "#8B85FF" Offset = "1"/ > < /LinearGradientBrush > < /Border.Background > < Border.Shadow > < Shadow Brush = "#6C63FF" Offset = "0,8" Radius = "32" Opacity = "0.5"/ > < /Border.Shadow > < Label Text = "U"
+FontFamily = "InterBold"
+FontSize = "48"
+TextColor = "White"
+HorizontalOptions = "Center"
+VerticalOptions = "Center"/ > < /Border > < Label x: Name = "AppNameLabel"
+Text = "Ubad"
+FontFamily = "InterBold"
+FontSize = "42"
+TextColor = "White"
+HorizontalOptions = "Center"
+Margin = "0,20,0,0"
+Opacity = "0"/ > < Label x: Name = "TaglineLabel"
+Text = "Premium Portfolio Platform"
+FontFamily = "InterRegular"
+FontSize = "16"
+TextColor = "#8888AA"
+HorizontalOptions = "Center"
+Margin = "0,8,0,0"
+Opacity = "0"/ > < /VerticalStackLayout >
+
+<!-- Loading Dots --> < HorizontalStackLayout x: Name = "DotsContainer"
+HorizontalOptions = "Center"
+VerticalOptions = "End"
+Margin = "0,0,0,80"
+Spacing = "8"
+Opacity = "0" > < BoxView x: Name = "Dot1" WidthRequest = "6" HeightRequest = "6"
+CornerRadius = "3" Color = "{StaticResource Primary}"/ > < BoxView x: Name = "Dot2" WidthRequest = "6" HeightRequest = "6"
+CornerRadius = "3" Color = "{StaticResource Primary}"/ > < BoxView x: Name = "Dot3" WidthRequest = "6" HeightRequest = "6"
+CornerRadius = "3" Color = "{StaticResource Primary}"/ > < /HorizontalStackLayout > < /Grid > < /ContentPage >

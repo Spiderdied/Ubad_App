@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Ubad.ViewModels"
+             xmlns:models="clr-namespace:Ubad.Models"
+             x:Class="Ubad.Views.FavoritesPage"
+             x:DataType="vm:FavoritesViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Padding="20,52,20,16"
+              ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0"
+                   Text="Favorites"
+                   Style="{StaticResource HeadlineStyle}"/>
+            <Label Grid.Column="1"
+                   Text="{Binding Favorites.Count, StringFormat='{0} saved'}"
+                   Style="{StaticResource CaptionStyle}"
+                   VerticalOptions="End"
+                   Margin="0,0,0,4"/>
+        </Grid>
+
+        <!-- Content -->
+        <Grid Grid.Row="1">
+
+            <!-- Loading -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                               IsVisible="{Binding IsLoading}"
+                               Color="{StaticResource Primary}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+
+            <!-- Empty State -->
+            <VerticalStackLayout
+                IsVisible="{Binding IsEmpty}"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                Spacing="16"
+                Padding="32">
+                <Label Text="🤍" FontSize="64" HorizontalOptions="Center"/>
+                <Label Text="No favorites yet"
+                       Style="{StaticResource SubtitleStyle}"
+                       HorizontalOptions="Center"/>
+                <Label Text="Tap the heart on any project to save it here"
+                       Style="{StaticResource BodyStyle}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+
+            <!-- List -->
+            <CollectionView ItemsSource="{Binding Favorites}"
+                            IsVisible="{Binding ShowContent}"
+                            Margin="0,0,0,20">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="12"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:FavoriteProject">
+                        <Border Margin="20,0"
+                                Style="{StaticResource CardStyle}"
+                                Padding="20">
+                            <Grid RowDefinitions="Auto,Auto,Auto,Auto">
+
+                                <!-- Name + Remove -->
+                                <Grid Grid.Row="0"
+                                      ColumnDefinitions="*,Auto"
+                                      Margin="0,0,0,6">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Name}"
+                                           FontFamily="InterBold"
+                                           FontSize="17"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"/>
+                                    <ImageButton Grid.Column="1"
+                                                 Source="icon_heart_filled.png"
+                                                 WidthRequest="36" HeightRequest="36"
+                                                 BackgroundColor="Transparent"
+                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FavoritesViewModel}},
+                                                           Path=RemoveCommand}"
+                                                 CommandParameter="{Binding .}"/>
+                                </Grid>
+
+                                <!-- Description -->
+                                <Label Grid.Row="1"
+                                       Text="{Binding Description}"
+                                       Style="{StaticResource BodyStyle}"
+                                       MaxLines="2"
+                                       LineBreakMode="TailTruncation"
+                                       Margin="0,0,0,12"/>
+
+                                <!-- Language + Stars -->
+                                <HorizontalStackLayout Grid.Row="2" Spacing="12">
+                                    <HorizontalStackLayout Spacing="5"
+                                        IsVisible="{Binding Language, Converter={StaticResource NullToVisibility}}">
+                                        <Ellipse WidthRequest="8" HeightRequest="8"
+                                                 Fill="{Binding LanguageColor, Converter={StaticResource HexToColor}}"
+                                                 VerticalOptions="Center"/>
+                                        <Label Text="{Binding Language}"
+                                               FontFamily="InterMedium"
+                                               FontSize="12"
+                                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"/>
+                                    </HorizontalStackLayout>
+
+                                    <Label Text="⭐"
+                                           FontSize="12" VerticalOptions="Center"/>
+                                    <Label Text="{Binding Stars, Converter={StaticResource StarCount}}"
+                                           FontFamily="InterMedium"
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                                           VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+
+                                <!-- Action Buttons -->
+                                <HorizontalStackLayout Grid.Row="3" Spacing="8" Margin="0,14,0,0">
+                                    <Button Text="GitHub"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            HeightRequest="36"
+                                            FontSize="12"
+                                            Padding="12,0"
+                                            CornerRadius="10"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FavoritesViewModel}},
+                                                      Path=OpenGitHubCommand}"
+                                            CommandParameter="{Binding .}"/>
+
+                                    <Button Text="Website"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            HeightRequest="36"
+                                            FontSize="12"
+                                            Padding="12,0"
+                                            CornerRadius="10"
+                                            IsVisible="{Binding PagesUrl, Converter={StaticResource NullToVisibility}}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:FavoritesViewModel}},
+                                                      Path=OpenWebsiteCommand}"
+                                            CommandParameter="{Binding .}"/>
+                                </HorizontalStackLayout>
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

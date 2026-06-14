@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Ubad.ViewModels"
+             x:Class="Ubad.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="0">
+
+            <!-- Header -->
+            <Grid Padding="20,52,20,24">
+                <Label Text="Settings" Style="{StaticResource HeadlineStyle}"/>
+            </Grid>
+
+            <!-- App Identity Card -->
+            <Border Margin="20,0,20,16" Style="{StaticResource CardStyle}" Padding="20">
+                <Grid ColumnDefinitions="64,*" ColumnSpacing="16">
+                    <!-- Logo -->
+                    <Border Grid.Column="0"
+                            WidthRequest="56" HeightRequest="56"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 14">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#6C63FF" Offset="0"/>
+                                <GradientStop Color="#8B85FF" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Label Text="U" FontFamily="InterBold" FontSize="28"
+                               TextColor="White" HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                    </Border>
+
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="{Binding AppName}"
+                               FontFamily="InterBold" FontSize="18"
+                               TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"/>
+                        <Label Text="{Binding AppVersion, StringFormat='Version {0}'}"
+                               Style="{StaticResource CaptionStyle}"/>
+                        <Label Text="{Binding GitHubUser, StringFormat='@{0}'}"
+                               FontFamily="InterMedium" FontSize="13"
+                               TextColor="{StaticResource Primary}"/>
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Theme Section -->
+            <Label Text="APPEARANCE"
+                   FontFamily="InterSemiBold"
+                   FontSize="11"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                   Margin="24,0,0,8"
+                   CharacterSpacing="1.5"/>
+
+            <Border Margin="20,0,20,20" Style="{StaticResource CardStyle}" Padding="0">
+                <VerticalStackLayout Spacing="0">
+
+                    <!-- Light -->
+                    <Grid Padding="20,16" ColumnDefinitions="*,Auto">
+                        <HorizontalStackLayout Grid.Column="0" Spacing="12">
+                            <Label Text="☀️" FontSize="18" VerticalOptions="Center"/>
+                            <Label Text="Light"
+                                   FontFamily="InterMedium" FontSize="15"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <RadioButton Grid.Column="1"
+                                     IsChecked="{Binding IsLightTheme}"
+                                     VerticalOptions="Center"/>
+                    </Grid>
+
+                    <BoxView Style="{StaticResource DividerStyle}" Margin="20,0"/>
+
+                    <!-- Dark -->
+                    <Grid Padding="20,16" ColumnDefinitions="*,Auto">
+                        <HorizontalStackLayout Grid.Column="0" Spacing="12">
+                            <Label Text="🌙" FontSize="18" VerticalOptions="Center"/>
+                            <Label Text="Dark"
+                                   FontFamily="InterMedium" FontSize="15"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <RadioButton Grid.Column="1"
+                                     IsChecked="{Binding IsDarkTheme}"
+                                     VerticalOptions="Center"/>
+                    </Grid>
+
+                    <BoxView Style="{StaticResource DividerStyle}" Margin="20,0"/>
+
+                    <!-- System -->
+                    <Grid Padding="20,16" ColumnDefinitions="*,Auto">
+                        <HorizontalStackLayout Grid.Column="0" Spacing="12">
+                            <Label Text="⚙️" FontSize="18" VerticalOptions="Center"/>
+                            <Label Text="Follow System"
+                                   FontFamily="InterMedium" FontSize="15"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <RadioButton Grid.Column="1"
+                                     IsChecked="{Binding IsSystemTheme}"
+                                     VerticalOptions="Center"/>
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Performance Section -->
+            <Label Text="PERFORMANCE"
+                   FontFamily="InterSemiBold"
+                   FontSize="11"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                   Margin="24,0,0,8"
+                   CharacterSpacing="1.5"/>
+
+            <Border Margin="20,0,20,20" Style="{StaticResource CardStyle}" Padding="0">
+                <VerticalStackLayout Spacing="0">
+
+                    <!-- Animations -->
+                    <Grid Padding="20,16" ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label Text="Enable Animations"
+                                   FontFamily="InterMedium" FontSize="15"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"/>
+                            <Label Text="Smooth transitions and effects"
+                                   Style="{StaticResource CaptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding EnableAnimations}"
+                                OnColor="{StaticResource Primary}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+
+                    <BoxView Style="{StaticResource DividerStyle}" Margin="20,0"/>
+
+                    <!-- Cache -->
+                    <Grid Padding="20,16" ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label Text="Cache Data"
+                                   FontFamily="InterMedium" FontSize="15"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"/>
+                            <Label Text="{Binding CacheSizeDisplay, StringFormat='Using {0}'}"
+                                   Style="{StaticResource CaptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding EnableCache}"
+                                OnColor="{StaticResource Primary}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+
+                    <BoxView Style="{StaticResource DividerStyle}" Margin="20,0"/>
+
+                    <!-- Clear Cache -->
+                    <Grid Padding="20,16" ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                            <Label Text="Clear Cache"
+                                   FontFamily="InterMedium" FontSize="15"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"/>
+                            <Label Text="Free up storage"
+                                   Style="{StaticResource CaptionStyle}"/>
+                        </VerticalStackLayout>
+                        <Button Text="Clear"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                HeightRequest="34"
+                                FontSize="12"
+                                Padding="12,0"
+                                CornerRadius="8"
+                                Command="{Binding ClearCacheCommand}"
+                                Grid.Column="1"/>
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- About Section -->
+            <Label Text="ABOUT"
+                   FontFamily="InterSemiBold"
+                   FontSize="11"
+                   TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                   Margin="24,0,0,8"
+                   CharacterSpacing="1.5"/>
+
+            <Border Margin="20,0,20,40" Style="{StaticResource CardStyle}" Padding="0">
+                <VerticalStackLayout Spacing="0">
+
+                    <Grid Padding="20,16" ColumnDefinitions="*,Auto">
+                        <HorizontalStackLayout Grid.Column="0" Spacing="12">
+                            <Label Text="GitHub" FontFamily="InterMedium" FontSize="15"
+                                   TextColor="{AppThemeBinding Light={StaticResource TextPrimaryLight}, Dark={StaticResource TextPrimaryDark}}"
+                                   VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                        <Label Grid.Column="1" Text="→"
+                               FontFamily="InterMedium" FontSize="16"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                               VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding OpenGitHubCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <BoxView Style="{StaticResource DividerStyle}" Margin="20,0"/>
+
+                    <Grid Padding="20,16" ColumnDefinitions="*">
+                        <Label Text="Built with .NET MAUI &amp; ❤️"
+                               FontFamily="InterRegular" FontSize="13"
+                               TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                               HorizontalOptions="Center"/>
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

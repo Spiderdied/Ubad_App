@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Ubad.ViewModels"
+             x:Class="Ubad.Views.BrowserPage"
+             x:DataType="vm:BrowserViewModel"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
+
+        <!-- ── Top Bar ──────────────────────────────────────────── -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*,Auto"
+              Padding="16,52,16,12"
+              BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
+
+            <ImageButton Grid.Column="0"
+                         Source="icon_close.png"
+                         WidthRequest="38" HeightRequest="38"
+                         CornerRadius="10"
+                         BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                         Padding="9"
+                         Command="{Binding CloseCommand}"/>
+
+            <!-- URL Display -->
+            <Border Grid.Column="1"
+                    Margin="10,0"
+                    StrokeShape="RoundRectangle 10"
+                    StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                    Padding="12,0">
+                <Label Text="{Binding PageTitle}"
+                       FontFamily="InterMedium"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={StaticResource TextSecondaryLight}, Dark={StaticResource TextSecondaryDark}}"
+                       VerticalOptions="Center"
+                       MaxLines="1"
+                       LineBreakMode="TailTruncation"
+                       HeightRequest="38"/>
+            </Border>
+
+            <ImageButton Grid.Column="2"
+                         Source="icon_share.png"
+                         WidthRequest="38" HeightRequest="38"
+                         CornerRadius="10"
+                         BackgroundColor="{AppThemeBinding Light={StaticResource CardLight}, Dark={StaticResource CardDark}}"
+                         Padding="9"
+                         Command="{Binding ShareCommand}"/>
+        </Grid>
+
+        <!-- ── Loading Progress ─────────────────────────────────── -->
+        <ProgressBar Grid.Row="1"
+                     Progress="{Binding LoadingProgress}"
+                     ProgressColor="{StaticResource Primary}"
+                     HeightRequest="2"
+                     IsVisible="{Binding IsLoading}"/>
+
+        <!-- ── WebView ───────────────────────────────────────────── -->
+        <WebView Grid.Row="2"
+                 x:Name="WebViewControl"
+                 Source="{Binding Url}"
+                 Navigating="OnNavigating"
+                 Navigated="OnNavigated"/>
+
+        <!-- ── Bottom Navigation Bar ────────────────────────────── -->
+        <Grid Grid.Row="3"
+              ColumnDefinitions="*,*,*,*"
+              Padding="16,8"
+              BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
+            <Border Grid.ColumnSpan="4"
+                    StrokeShape="RoundRectangle 0" StrokeThickness="0"
+                    BackgroundColor="Transparent">
+                <Grid ColumnDefinitions="*,*,*,*">
+
+                    <ImageButton Grid.Column="0"
+                                 Source="icon_back.png"
+                                 WidthRequest="44" HeightRequest="44"
+                                 CornerRadius="10"
+                                 BackgroundColor="Transparent"
+                                 Command="{Binding GoBackCommand}"
+                                 IsEnabled="{Binding CanGoBack}"
+                                 Opacity="{Binding CanGoBack, Converter={StaticResource BoolToVisibility}}"/>
+
+                    <ImageButton Grid.Column="1"
+                                 Source="icon_forward.png"
+                                 WidthRequest="44" HeightRequest="44"
+                                 CornerRadius="10"
+                                 BackgroundColor="Transparent"
+                                 Command="{Binding GoForwardCommand}"
+                                 IsEnabled="{Binding CanGoForward}"/>
+
+                    <ImageButton Grid.Column="2"
+                                 Source="icon_refresh.png"
+                                 WidthRequest="44" HeightRequest="44"
+                                 CornerRadius="10"
+                                 BackgroundColor="Transparent"
+                                 Command="{Binding RefreshCommand}"/>
+
+                    <ImageButton Grid.Column="3"
+                                 Source="icon_external.png"
+                                 WidthRequest="44" HeightRequest="44"
+                                 CornerRadius="10"
+                                 BackgroundColor="Transparent"
+                                 Command="{Binding OpenExternalCommand}"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>
