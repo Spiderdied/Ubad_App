@@ -15,13 +15,11 @@
         <Optimize>true</Optimize>
     </PropertyGroup>
 
-    <!-- ── App Info ──────────────────────────────────────────── -->
     <PropertyGroup>
         <ApplicationTitle>Ubad</ApplicationTitle>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
-    <!-- ── Images ────────────────────────────────────────────── -->
     <ItemGroup>
         <MauiImage Include="Resources\Images\*"
                    BaseSize="300,185"/>
@@ -33,24 +31,21 @@
                           BaseSize="128,128"/>
     </ItemGroup>
 
-    <!-- ── Fonts ─────────────────────────────────────────────── -->
     <ItemGroup>
         <MauiFont Include="Resources\Fonts\*"/>
     </ItemGroup>
 
-    <!-- ── Raw Assets ────────────────────────────────────────── -->
     <ItemGroup>
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)"/>
     </ItemGroup>
 
-    <!-- ── NuGet ──────────────────────────────────────────────── -->
     <ItemGroup>
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)"/>
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
     </ItemGroup>
 
-    <!-- ── Android ───────────────────────────────────────────── -->
     <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
         <AndroidSigningKeyPass></AndroidSigningKeyPass>
         <AndroidSigningStorePass></AndroidSigningStorePass>
