@@ -20,10 +20,16 @@ namespace Ubad.Views
 
         private async Task RunAnimationsAsync()
         {
-            // Logo fade + scale
-            LogoBorder.Scale   = 0.5;
-            LogoBorder.Opacity = 0;
+            // Reset initial states
+            LogoBorder.Scale        = 0.5;
+            LogoBorder.Opacity      = 0;
+            AppNameLabel.Opacity    = 0;
+            AppNameLabel.TranslationY = 20;
+            TaglineLabel.Opacity    = 0;
+            TaglineLabel.TranslationY = 15;
+            DotsContainer.Opacity   = 0;
 
+            // Animate logo
             await Task.WhenAll(
                 LogoBorder.FadeTo(1, 600, Easing.CubicOut),
                 LogoBorder.ScaleTo(1, 600, Easing.CubicOut)
@@ -31,8 +37,7 @@ namespace Ubad.Views
 
             await Task.Delay(100);
 
-            // App name slide up
-            AppNameLabel.TranslationY = 20;
+            // Animate app name
             await Task.WhenAll(
                 AppNameLabel.FadeTo(1, 400, Easing.CubicOut),
                 AppNameLabel.TranslateTo(0, 0, 400, Easing.CubicOut)
@@ -40,43 +45,59 @@ namespace Ubad.Views
 
             await Task.Delay(80);
 
-            TaglineLabel.TranslationY = 15;
+            // Animate tagline
             await Task.WhenAll(
                 TaglineLabel.FadeTo(1, 350, Easing.CubicOut),
                 TaglineLabel.TranslateTo(0, 0, 350, Easing.CubicOut)
             );
 
-            // Dots
+            // Show loading dots
             await DotsContainer.FadeTo(1, 300);
 
-            // Pulse dots
-            _ = AnimateDotsAsync();
+            // Start dot pulse animation
+            var dotsCts = new CancellationTokenSource();
+            _ = AnimateDotsAsync(dotsCts.Token);
 
-            // Initialize app (pre-warm)
+            // Pre-warm data in background
             await _vm.InitializeAsync();
 
-            // Transition
+            // Stop dots and fade out
+            dotsCts.Cancel();
+
             await Task.WhenAll(
                 LogoStack.FadeTo(0, 300, Easing.CubicIn),
                 DotsContainer.FadeTo(0, 300)
             );
 
-            // Navigate to shell
-            Application.Current!.MainPage = new AppShell();
+            // ✅ Navigate via DI — لا new AppShell()
+            var shell = IPlatformApplication.Current!.Services
+                            .GetRequiredService<AppShell>();
+
+            Application.Current!.MainPage = shell;
         }
 
-        private async Task AnimateDotsAsync()
+        private async Task AnimateDotsAsync(CancellationToken ct)
         {
-            while (IsVisible)
+            try
             {
-                await Dot1.ScaleTo(1.6, 200, Easing.CubicOut);
-                await Dot1.ScaleTo(1.0, 200, Easing.CubicIn);
-                await Dot2.ScaleTo(1.6, 200, Easing.CubicOut);
-                await Dot2.ScaleTo(1.0, 200, Easing.CubicIn);
-                await Dot3.ScaleTo(1.6, 200, Easing.CubicOut);
-                await Dot3.ScaleTo(1.0, 200, Easing.CubicIn);
-                await Task.Delay(300);
+                while (!ct.IsCancellationRequested)
+                {
+                    await Dot1.ScaleTo(1.6, 200, Easing.CubicOut);
+                    if (ct.IsCancellationRequested) break;
+                    await Dot1.ScaleTo(1.0, 200, Easing.CubicIn);
+
+                    await Dot2.ScaleTo(1.6, 200, Easing.CubicOut);
+                    if (ct.IsCancellationRequested) break;
+                    await Dot2.ScaleTo(1.0, 200, Easing.CubicIn);
+
+                    await Dot3.ScaleTo(1.6, 200, Easing.CubicOut);
+                    if (ct.IsCancellationRequested) break;
+                    await Dot3.ScaleTo(1.0, 200, Easing.CubicIn);
+
+                    await Task.Delay(300, ct);
+                }
             }
+            catch (TaskCanceledException) { /* طبيعي */ }
         }
     }
 }
