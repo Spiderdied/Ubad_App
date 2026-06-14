@@ -15,24 +15,31 @@ namespace Ubad.Services
         private string GetFullKey(string key) =>
             $"{AppConfig.CachePrefix}{key}";
 
+        // ✅ يحذف البيانات التالفة أو المنتهية تلقائياً
         public async Task<T?> GetAsync<T>(string key) where T : class
         {
             await Task.Yield();
+            var fullKey = GetFullKey(key);
             try
             {
-                var fullKey = GetFullKey(key);
-                var raw     = Preferences.Get(fullKey, string.Empty);
-                if (string.IsNullOrEmpty(raw)) return null;
+                var raw = Preferences.Get(fullKey, string.Empty);
+                if (string.IsNullOrWhiteSpace(raw)) return null;
 
                 var entry = JsonSerializer.Deserialize<CacheEntry<T>>(raw, _opts);
                 if (entry == null || entry.ExpiresAt < DateTime.UtcNow)
                 {
-                    Preferences.Remove(fullKey);
+                    Preferences.Remove(fullKey); // ✅ احذف المنتهية الصلاحية
                     return null;
                 }
                 return entry.Data;
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"[Cache] GetAsync error for '{key}': {ex.Message}");
+                Preferences.Remove(fullKey); // ✅ احذف البيانات التالفة
+                return null;
+            }
         }
 
         public async Task SetAsync<T>(string key, T value, int expiryMinutes) where T : class
@@ -40,13 +47,15 @@ namespace Ubad.Services
             await Task.Yield();
             try
             {
-                var entry   = new CacheEntry<T>(value, DateTime.UtcNow.AddMinutes(expiryMinutes));
-                var json    = JsonSerializer.Serialize(entry, _opts);
+                var entry = new CacheEntry<T>(value,
+                    DateTime.UtcNow.AddMinutes(expiryMinutes));
+                var json = JsonSerializer.Serialize(entry, _opts);
                 Preferences.Set(GetFullKey(key), json);
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[Cache] Set error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine(
+                    $"[Cache] SetAsync error for '{key}': {ex.Message}");
             }
         }
 
@@ -59,23 +68,24 @@ namespace Ubad.Services
         public async Task ClearAllAsync()
         {
             await Task.Yield();
-            // MAUI Preferences doesn't expose prefix-based clearing natively;
-            // clear known keys.
-            var keys = new[] { "github_profile", "pinned_repos" };
-            foreach (var k in keys)
+            var knownKeys = new[]
+            {
+                "github_profile",
+                "pinned_repos"
+            };
+            foreach (var k in knownKeys)
                 Preferences.Remove(GetFullKey(k));
         }
 
         public async Task<long> GetCacheSizeBytesAsync()
         {
             await Task.Yield();
-            // Approximate: sum stored string lengths * 2 (UTF-16)
             long size = 0;
-            var keys  = new[] { "github_profile", "pinned_repos" };
-            foreach (var k in keys)
+            var knownKeys = new[] { "github_profile", "pinned_repos" };
+            foreach (var k in knownKeys)
             {
                 var raw = Preferences.Get(GetFullKey(k), string.Empty);
-                size += raw.Length * 2;
+                size += raw.Length * 2L; // UTF-16
             }
             return size;
         }
